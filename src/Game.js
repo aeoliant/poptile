@@ -38,6 +38,9 @@ var game = {
 			if (target == undefined) {
 				game.pop(h, w, game.board[h][w]);
 				game.gravity();
+				game.shift();
+				game.generateNewLine();
+				game.print();
 			}
 			if (game.board[h][w] == target) {
 				game.board[h][w] = EMPTY;
@@ -47,7 +50,6 @@ var game = {
 				game.pop(h, w - 1, target);
 			}
 		}
-		game.print();
 	},
 
 	inBounds: function (h, w) {
@@ -90,15 +92,29 @@ var game = {
 			}
 			h = 0;
 		}
-		game.print();
 	},
 
 	shift: function () {
-		
-	}
+		var h = 0, w = 0;
+		for (; w < game.width; w++) {
+			for (; h < game.height && game.board[h][w] != EMPTY; h++) {console.log(h);}
+			if (h == game.height) {
+				h = 0;
+				continue;
+			}
+			var top = h;
+			for (; h >= 0; h--) {
+				game.board[h + 1][w] = game.board[h][w];
+			}
+			h = 0;
+		}
+	},
 
 	generateNewLine: function () {
-
+		var w = 0;
+		for (; w < game.width; w++) {
+			game.board[0][w] = game.randomColour();
+		}
 	},
 
 	print: function() {
