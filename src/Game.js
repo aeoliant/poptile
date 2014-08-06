@@ -5,7 +5,7 @@ var game = {
 		game.width = 4;
 		game.height = 13;
 		game.board = [];
-		game.numColours = 4;
+		game.numColours = 5;
 		game.charKey = ['*', '#', '@', '!', '&', '%'];
 		for (;h < game.height; h++) {
 			game.board[h] = [];
@@ -14,6 +14,7 @@ var game = {
 	},
 
 	newGame: function() {
+		game.score = 0;
 		var h = 0, w = 0;
 		for (; h < 4; h++) {
 			for (;w < game.width; w++) {
@@ -44,6 +45,7 @@ var game = {
 			}
 			if (game.board[h][w] == target) {
 				game.board[h][w] = EMPTY;
+				game.score++;
 				game.pop(h + 1, w, target);
 				game.pop(h - 1, w, target);
 				game.pop(h, w + 1, target);
@@ -60,32 +62,28 @@ var game = {
 	gravity: function () {
 		var h = 0, w = 0;
 		for (; w < game.width; w++) {
-			for (; h < game.height && game.board[h][w] != EMPTY; h++) {console.log(h);}
+			for (; h < game.height && game.board[h][w] != EMPTY; h++) {}
 			if (h == game.height) {
 				h = 0;
 				continue;
 			}
 			var ground = h;
-			console.log("ground = " + ground);
-			for (; h < game.height && game.board[h][w] == EMPTY; h++) {console.log(h);}
+			for (; h < game.height && game.board[h][w] == EMPTY; h++) {}
 			if (h == game.height) {
 				h = 0;
 				continue;
 			}
 			var sky = h;
 			var diff = sky - ground;
-			console.log("sky = " + sky);
 			if (diff == 0) {
 				h = 0;
 				continue;
 			}
 			for (; h < game.height && game.board[h][w] != EMPTY; h++) {
 				game.board[h - diff][w] = game.board[h][w];
-				console.log("moving [" + h + ", " + w + "] to [" + (h - diff) + ", " + w + "]");
 			}
 			h = h - diff;
 			var outerspace = h;
-			console.log("outerspace = " + outerspace);
 			for (; h < outerspace + diff; h++) {
 				console.log(h);
 				game.board[h][w] = EMPTY;
@@ -115,6 +113,15 @@ var game = {
 		for (; w < game.width; w++) {
 			game.board[0][w] = game.randomColour();
 		}
+	},
+
+	checkGameOver: function () {
+		var w = 0;
+		for (; w < game.width; w++) {
+			if (game.board[game.height - 1][w] != EMPTY)
+				return true;
+		}
+		return false;
 	},
 
 	print: function() {
