@@ -14,6 +14,7 @@ var game = {
 	},
 
 	newGame: function() {
+		game.gameOver = false;
 		game.score = 0;
 		var h = 0, w = 0;
 		for (; h < 4; h++) {
@@ -35,12 +36,13 @@ var game = {
 	},
 
 	pop: function (h, w, target) {
-		if (game.inBounds(h, w)) {
+		if (!game.gameOver && game.inBounds(h, w)) {
 			if (target == undefined) {
 				game.pop(h, w, game.board[h][w]);
 				game.gravity();
 				game.shift();
 				game.generateNewLine();
+				game.checkGameOver();
 				game.print();
 			}
 			if (game.board[h][w] == target) {
@@ -119,9 +121,8 @@ var game = {
 		var w = 0;
 		for (; w < game.width; w++) {
 			if (game.board[game.height - 1][w] != EMPTY)
-				return true;
+				game.gameOver = true;
 		}
-		return false;
 	},
 
 	print: function() {
