@@ -18,6 +18,7 @@
 			var WIDTH = elem.offsetWidth;
 			var HEIGHT = elem.offsetHeight;
 			var s = Snap("#svg");
+			var squares = s.g();
 
 			game.init();
 
@@ -38,14 +39,16 @@
 					function(a) {
 						a.fromElement.setAttribute("fill", COLOURS[game.board[parseInt(a.fromElement.getAttribute("gameh"))][parseInt(a.fromElement.getAttribute("gamew"))]]);
 					});
+					squares.add(square);
 				}
 				w = 0;
 			}
+			
 			var topLine = s.line(Math.round(midx - (game.width * CELL_SIZE / 2)), Math.round(midy - (game.height * CELL_SIZE / 2 - CELL_SIZE * 2) - 100), Math.round(midx + (game.width * CELL_SIZE / 2)), Math.round(midy - (game.height * CELL_SIZE / 2 - CELL_SIZE * 2) - 100));
 			topLine.attr({
 				stroke: "#7f8c8d",
 				strokeWidth: 2,
-				"stroke-dasharray" : [5]
+				"stroke-dasharray" : [4]
 			});
 			console.log(game.score);
 			var score = s.text(-100, -100, game.score.toString());
@@ -59,7 +62,34 @@
 			score.attr({
 				x: Math.round(midx - (scoreBox.width/2)),
 				y: Math.round(midy + (game.height * CELL_SIZE / 2))
-			})
+			});
+
+			var redraw = function () {
+				var i = 0;
+				for (; i < game.height * game.width; i++) {
+					var h = squares[i].attr("gameh");
+					var w = squares[i].attr("gamew");
+					squares[i].attr({
+						fill: COLOURS[game.board[h][w]]
+					});
+				}
+				score.node.textContent = game.score;
+				var sbox = score.getBBox();
+				score.attr({
+					x: Math.round(midx - (sbox.width/2)),
+					y: Math.round(midy + (game.height * CELL_SIZE / 2))
+				});
+			};
+
+			squares.click(function (a,b,c) {
+				console.log(a.target);
+				var h = parseInt(a.target.getAttribute("gameh"));
+				var w = parseInt(a.target.getAttribute("gamew"));
+				game.pop(h, w);
+				redraw();
+			});
+
+
 		</script>
 	</body>
 </html>

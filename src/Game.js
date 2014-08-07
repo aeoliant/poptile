@@ -37,15 +37,15 @@ var game = {
 
 	pop: function (h, w, target) {
 		if (!game.gameOver && game.inBounds(h, w)) {
-			if (target == undefined) {
+			if (target == undefined && game.board[h][w] != EMPTY) {
 				game.pop(h, w, game.board[h][w]);
 				game.gravity();
 				game.shift();
 				game.generateNewLine();
 				game.checkGameOver();
-				game.print();
+				//game.print();
 			}
-			if (game.board[h][w] == target) {
+			else if (game.board[h][w] == target) {
 				game.board[h][w] = EMPTY;
 				game.score++;
 				game.pop(h + 1, w, target);
@@ -95,18 +95,12 @@ var game = {
 	},
 
 	shift: function () {
-		var h = 0, w = 0;
+		var h = game.height - 1, w = 0;
 		for (; w < game.width; w++) {
-			for (; h < game.height && game.board[h][w] != EMPTY; h++) {console.log(h);}
-			if (h == game.height) {
-				h = 0;
-				continue;
+			for (; h > 0; h--) {
+				game.board[h][w] = game.board[h - 1][w];
 			}
-			var top = h;
-			for (; h >= 0; h--) {
-				game.board[h + 1][w] = game.board[h][w];
-			}
-			h = 0;
+			h = game.height - 1;
 		}
 	},
 
@@ -138,4 +132,4 @@ var game = {
 
 };
 
-module.exports.game = game;
+//module.exports.game = game;
