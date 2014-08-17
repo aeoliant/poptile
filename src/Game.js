@@ -53,7 +53,7 @@ var game = {
 			}
 			else if (game.board[h][w] == target) {
 				game.board[h][w] = EMPTY;
-				game.score++;
+				game.bumpScore();
 				game.pop(h + 1, w, target);
 				game.pop(h - 1, w, target);
 				game.pop(h, w + 1, target);
