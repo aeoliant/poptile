@@ -5,7 +5,7 @@ var game = {
 		game.width = 4;
 		game.height = 13;
 		game.board = [];
-		game.numColours = 5;
+		game.numColours = 4;
 		game.charKey = ['*', '#', '@', '!', '&', '%'];
 		for (;h < game.height; h++) {
 			game.board[h] = [];
@@ -16,6 +16,8 @@ var game = {
 	newGame: function() {
 		game.gameOver = false;
 		game.score = 0;
+		game.limit = 200;
+		game.diff = 400;
 		var h = 0, w = 0;
 		for (; h < 4; h++) {
 			for (;w < game.width; w++) {
@@ -39,11 +41,15 @@ var game = {
 		if (!game.gameOver && game.inBounds(h, w)) {
 			if (target == undefined && game.board[h][w] != EMPTY) {
 				game.pop(h, w, game.board[h][w]);
-				while (game.gravity() && game.cascade()) {}
+				var steps = [];
+				while (steps.push(game.copy2dArray(game.board)) && game.gravity(steps) && steps.push(game.copy2dArray(game.board)) && game.cascade()) {
+				}
+				console.log(steps);
 				game.shift();
 				game.generateNewLine();
 				game.checkGameOver();
 				//game.print();
+				return steps;
 			}
 			else if (game.board[h][w] == target) {
 				game.board[h][w] = EMPTY;
@@ -62,9 +68,11 @@ var game = {
 
 	// Simulates gravity by making all tiles fall down as far as they go
 	// Returns: true if anything moved, false otherwise
-	gravity: function() {
+	gravity: function(steps) {
 		var h = 0, w = 0, moved = false;
+		var vectorGraph = [];
 		for (; w < game.width; w++) {
+			vectorGraph[w] = [];
 			var moveDown = 0;
 			for (; h < game.height; h++) {
 				if (game.board[h][w] == EMPTY) {
@@ -75,13 +83,19 @@ var game = {
 						moved = true;
 					}
 					game.board[h - moveDown][w] = game.board[h][w];
-					if (moveDown > 0)
+					
+					if (moveDown > 0) {
+						vectorGraph[w][h] = moveDown;
 						game.board[h][w] = EMPTY;
+					}
 				}
 			}
 			h = 0;
 		}
-		console.log("moved: " + moved);
+		//console.log("moved: " + moved);
+		//console.log(vectorGraph);
+		if (moved) 
+			steps.push(vectorGraph);
 		return moved;
 	},
 
@@ -97,7 +111,7 @@ var game = {
 				vcount++;
 			}
 		}
-		console.log("[" + h + ", " + w + "] hcount: " + hcount + " vcount: " + vcount);
+		//console.log("[" + h + ", " + w + "] hcount: " + hcount + " vcount: " + vcount);
 		return (hcount == 3) || (vcount == 3);
 	},
 
@@ -109,13 +123,13 @@ var game = {
 			for (; w < game.width; w++) {
 				if (game.board[h][w] != EMPTY && game.check3(h, w)) {
 					popped = true;
-					console.log("popped: [" + h + ", " + w + "]");
+					//console.log("popped: [" + h + ", " + w + "]");
 					game.pop(h, w, game.board[h][w]);
 				}
 			}
 			w = 0;
 		}
-		console.log("popped: " + popped);
+		//console.log("popped: " + popped);
 		return popped;
 	},
 
@@ -168,6 +182,22 @@ var game = {
 			}
 			process.stdout.write('\n');
 			w = 0;
+		}
+	},
+
+	copy2dArray: function(arr) {
+		var i = 0, len = arr.length, copy = new Array(len);
+		for (; i < len; i++)
+    		copy[i] = arr[i].slice(0);
+    	return copy;
+	},
+
+	bumpScore: function() {
+		game.score++;
+		if (game.score >= game.limit) {
+			game.limit = game.limit + game.diff;
+			game.diff = game.diff * 2;
+			game.numColours++;
 		}
 	}
 
